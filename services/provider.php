@@ -19,29 +19,18 @@ use Joomla\DI\ServiceProviderInterface;
 use Joomla\Event\DispatcherInterface;
 use ColdStar\Plugin\Content\CsAutogallery\Extension\CsAutogallery;
 
-return new class () implements ServiceProviderInterface {
-    /**
-     * Registers the service provider with a DI container.
-     *
-     * @param   Container  $container  The DI container.
-     *
-     * @return  void
-     */
-    public function register(Container $container): void
+return new class implements ServiceProviderInterface {
+    public function register(Container $container)
     {
         $container->set(
             PluginInterface::class,
             function (Container $container) {
-                $config = (array) PluginHelper::getPlugin('content', 'csautogallery');
-                $subject = $container->get(DispatcherInterface::class);
-
+                $dispatcher = $container->get(DispatcherInterface::class);
                 $plugin = new CsAutogallery(
-                    $subject,
-                    $config
+                    $dispatcher,
+                    (array) PluginHelper::getPlugin('content', 'csautogallery')
                 );
-
                 $plugin->setApplication(Factory::getApplication());
-
                 return $plugin;
             }
         );
