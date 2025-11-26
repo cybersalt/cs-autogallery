@@ -5,6 +5,7 @@
  * @subpackage  Content.csautogallery
  * @version     1.5.0
  * @since       5.0
+ * @copyright   (C) 2025 Cybersalt Consulting Ltd. All rights reserved.
  * @license     GNU General Public License version 2 or later
  */
 

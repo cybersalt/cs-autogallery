@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="plugin" group="content" method="upgrade">
     <name>plg_content_csautogallery</name>
-    <author>ColdStar Technology</author>
-    <creationDate>2024-11</creationDate>
-    <copyright>(C) 2024 ColdStar Technology. All rights reserved.</copyright>
+    <author>Tim Davis - Cybersalt Consulting Ltd.</author>
+    <creationDate>2025-11</creationDate>
+    <copyright>(C) 2025 Cybersalt Consulting Ltd. All rights reserved.</copyright>
     <license>GNU General Public License version 2 or later</license>
-    <authorEmail>info@coldstartech.com</authorEmail>
-    <authorUrl>https://coldstartech.com</authorUrl>
+    <authorEmail>tim@cybersalt.com</authorEmail>
+    <authorUrl>https://cybersalt.com</authorUrl>
     <version>1.5.0</version>
     <description>PLG_CONTENT_CSAUTOGALLERY_XML_DESCRIPTION</description>
     <namespace path="src">ColdStar\Plugin\Content\CsAutogallery</namespace>
