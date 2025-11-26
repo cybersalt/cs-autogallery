@@ -16,7 +16,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Event\SubscriberInterface;
-use Joomla\CMS\Event\Content\ContentPrepareEvent;
+use Joomla\Event\Event;
 
 /**
  * CS Auto Gallery Content Plugin
@@ -61,18 +61,16 @@ final class CsAutogallery extends CMSPlugin implements SubscriberInterface
     /**
      * Plugin method to process {auto-gallery} shortcodes in content.
      *
-     * @param   ContentPrepareEvent  $event  The content prepare event.
+     * @param   Event  $event  The content prepare event.
      *
      * @return  void
      *
      * @since   5.0
      */
-    public function onContentPrepare(ContentPrepareEvent $event): void
+    public function onContentPrepare(Event $event): void
     {
-        // Extract arguments from the event
-        $context = $event->getContext();
-        $article = $event->getItem();
-        $params  = $event->getParams();
+        // Extract arguments from the event - works for both Joomla 4 and 5
+        [$context, $article, $params, $page] = array_values($event->getArguments());
 
         if (!is_object($article) || empty($article->text) || strpos($article->text, '{auto-gallery') === false) {
             return;
