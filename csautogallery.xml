@@ -11,7 +11,7 @@
     <description>PLG_CONTENT_CSAUTOGALLERY_XML_DESCRIPTION</description>
     <namespace path="src">ColdStar\Plugin\Content\CsAutogallery</namespace>
     <files>
-        <folder plugin="autogallery">services</folder>
+        <folder plugin="csautogallery">services</folder>
         <folder>src</folder>
         <filename>index.html</filename>
     </files>

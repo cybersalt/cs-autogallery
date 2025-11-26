@@ -32,7 +32,7 @@ return new class () implements ServiceProviderInterface {
         $container->set(
             PluginInterface::class,
             function (Container $container) {
-                $config = (array) PluginHelper::getPlugin('content', 'autogallery');
+                $config = (array) PluginHelper::getPlugin('content', 'csautogallery');
                 $subject = $container->get(DispatcherInterface::class);
 
                 $plugin = new CsAutogallery(
