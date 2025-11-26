@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension type="plugin" group="content" method="upgrade">
-    <name>plg_content_autogallery</name>
+    <name>plg_content_csautogallery</name>
     <author>ColdStar Technology</author>
     <creationDate>2024-11</creationDate>
     <copyright>(C) 2024 ColdStar Technology. All rights reserved.</copyright>
@@ -8,53 +8,64 @@
     <authorEmail>info@coldstartech.com</authorEmail>
     <authorUrl>https://coldstartech.com</authorUrl>
     <version>1.5.0</version>
-    <description>PLG_CONTENT_AUTOGALLERY_XML_DESCRIPTION</description>
-    <namespace path="src">ColdStar\Plugin\Content\Autogallery</namespace>
+    <description>PLG_CONTENT_CSAUTOGALLERY_XML_DESCRIPTION</description>
+    <namespace path="src">ColdStar\Plugin\Content\CsAutogallery</namespace>
     <files>
         <folder plugin="autogallery">services</folder>
         <folder>src</folder>
         <filename>index.html</filename>
     </files>
     <languages>
-        <language tag="en-GB">language/en-GB/plg_content_autogallery.ini</language>
-        <language tag="en-GB">language/en-GB/plg_content_autogallery.sys.ini</language>
+        <language tag="en-GB">language/en-GB/plg_content_csautogallery.ini</language>
+        <language tag="en-GB">language/en-GB/plg_content_csautogallery.sys.ini</language>
     </languages>
     <config>
         <fields name="params">
-            <fieldset name="basic" label="PLG_CONTENT_AUTOGALLERY_FIELDSET_BASIC">
+            <fieldset name="basic" label="PLG_CONTENT_CSAUTOGALLERY_FIELDSET_BASIC">
+                <field
+                    name="enable_lightbox"
+                    type="radio"
+                    label="PLG_CONTENT_CSAUTOGALLERY_LIGHTBOX_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_LIGHTBOX_DESC"
+                    layout="joomla.form.field.radio.switcher"
+                    default="1"
+                >
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
                 <field
                     name="base_fs"
                     type="text"
-                    label="PLG_CONTENT_AUTOGALLERY_BASE_FS_LABEL"
-                    description="PLG_CONTENT_AUTOGALLERY_BASE_FS_DESC"
+                    label="PLG_CONTENT_CSAUTOGALLERY_BASE_FS_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_BASE_FS_DESC"
                     default="{JPATH_ROOT}/images/music"
                 />
                 <field
                     name="base_url"
                     type="text"
-                    label="PLG_CONTENT_AUTOGALLERY_BASE_URL_LABEL"
-                    description="PLG_CONTENT_AUTOGALLERY_BASE_URL_DESC"
+                    label="PLG_CONTENT_CSAUTOGALLERY_BASE_URL_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_BASE_URL_DESC"
                     default="/images/music"
                 />
                 <field
                     name="extensions"
                     type="text"
-                    label="PLG_CONTENT_AUTOGALLERY_EXT_LABEL"
-                    description="PLG_CONTENT_AUTOGALLERY_EXT_DESC"
+                    label="PLG_CONTENT_CSAUTOGALLERY_EXT_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_EXT_DESC"
                     default="jpg,jpeg,png,gif,webp,avif"
                 />
                 <field
                     name="col_classes"
                     type="text"
-                    label="PLG_CONTENT_AUTOGALLERY_COLS_LABEL"
-                    description="PLG_CONTENT_AUTOGALLERY_COLS_DESC"
+                    label="PLG_CONTENT_CSAUTOGALLERY_COLS_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_COLS_DESC"
                     default="col-6 col-sm-4 col-md-3 col-lg-3"
                 />
                 <field
                     name="show_captions"
                     type="radio"
-                    label="PLG_CONTENT_AUTOGALLERY_CAPTIONS_LABEL"
-                    description="PLG_CONTENT_AUTOGALLERY_CAPTIONS_DESC"
+                    label="PLG_CONTENT_CSAUTOGALLERY_CAPTIONS_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_CAPTIONS_DESC"
                     layout="joomla.form.field.radio.switcher"
                     default="1"
                 >
@@ -64,8 +75,8 @@
                 <field
                     name="show_empty_message"
                     type="radio"
-                    label="PLG_CONTENT_AUTOGALLERY_EMPTY_LABEL"
-                    description="PLG_CONTENT_AUTOGALLERY_EMPTY_DESC"
+                    label="PLG_CONTENT_CSAUTOGALLERY_EMPTY_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_EMPTY_DESC"
                     layout="joomla.form.field.radio.switcher"
                     default="1"
                 >
@@ -75,8 +86,8 @@
                 <field
                     name="show_debug_path"
                     type="radio"
-                    label="PLG_CONTENT_AUTOGALLERY_DEBUG_LABEL"
-                    description="PLG_CONTENT_AUTOGALLERY_DEBUG_DESC"
+                    label="PLG_CONTENT_CSAUTOGALLERY_DEBUG_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_DEBUG_DESC"
                     layout="joomla.form.field.radio.switcher"
                     default="0"
                 >
@@ -84,30 +95,44 @@
                     <option value="0">JNO</option>
                 </field>
             </fieldset>
-            <fieldset name="thumbnails" label="PLG_CONTENT_AUTOGALLERY_FIELDSET_THUMBNAILS">
+            <fieldset name="thumbnails" label="PLG_CONTENT_CSAUTOGALLERY_FIELDSET_THUMBNAILS">
+                <field
+                    name="image_width"
+                    type="text"
+                    label="PLG_CONTENT_CSAUTOGALLERY_IMAGE_WIDTH_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_IMAGE_WIDTH_DESC"
+                    hint="e.g., 200px, 100%, auto"
+                />
+                <field
+                    name="image_height"
+                    type="text"
+                    label="PLG_CONTENT_CSAUTOGALLERY_IMAGE_HEIGHT_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_IMAGE_HEIGHT_DESC"
+                    hint="e.g., 200px, auto"
+                />
                 <field
                     name="thumb_min_w"
                     type="text"
-                    label="PLG_CONTENT_AUTOGALLERY_THUMB_MIN_W_LABEL"
-                    description="PLG_CONTENT_AUTOGALLERY_THUMB_MIN_W_DESC"
+                    label="PLG_CONTENT_CSAUTOGALLERY_THUMB_MIN_W_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_THUMB_MIN_W_DESC"
                 />
                 <field
                     name="thumb_max_w"
                     type="text"
-                    label="PLG_CONTENT_AUTOGALLERY_THUMB_MAX_W_LABEL"
-                    description="PLG_CONTENT_AUTOGALLERY_THUMB_MAX_W_DESC"
+                    label="PLG_CONTENT_CSAUTOGALLERY_THUMB_MAX_W_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_THUMB_MAX_W_DESC"
                 />
                 <field
                     name="thumb_min_h"
                     type="text"
-                    label="PLG_CONTENT_AUTOGALLERY_THUMB_MIN_H_LABEL"
-                    description="PLG_CONTENT_AUTOGALLERY_THUMB_MIN_H_DESC"
+                    label="PLG_CONTENT_CSAUTOGALLERY_THUMB_MIN_H_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_THUMB_MIN_H_DESC"
                 />
                 <field
                     name="thumb_max_h"
                     type="text"
-                    label="PLG_CONTENT_AUTOGALLERY_THUMB_MAX_H_LABEL"
-                    description="PLG_CONTENT_AUTOGALLERY_THUMB_MAX_H_DESC"
+                    label="PLG_CONTENT_CSAUTOGALLERY_THUMB_MAX_H_LABEL"
+                    description="PLG_CONTENT_CSAUTOGALLERY_THUMB_MAX_H_DESC"
                 />
             </fieldset>
         </fields>

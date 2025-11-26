@@ -2,7 +2,7 @@
 
 /**
  * @package     Joomla.Plugin
- * @subpackage  Content.autogallery
+ * @subpackage  Content.csautogallery
  * @version     1.5.0
  * @since       5.0
  * @license     GNU General Public License version 2 or later
@@ -16,7 +16,7 @@ use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Joomla\Event\DispatcherInterface;
-use ColdStar\Plugin\Content\Autogallery\Extension\Autogallery;
+use ColdStar\Plugin\Content\CsAutogallery\Extension\CsAutogallery;
 
 return new class () implements ServiceProviderInterface {
     /**
@@ -34,7 +34,7 @@ return new class () implements ServiceProviderInterface {
                 $config = (array) PluginHelper::getPlugin('content', 'autogallery');
                 $subject = $container->get(DispatcherInterface::class);
 
-                $plugin = new Autogallery(
+                $plugin = new CsAutogallery(
                     $subject,
                     $config
                 );

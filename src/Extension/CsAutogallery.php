@@ -2,13 +2,14 @@
 
 /**
  * @package     Joomla.Plugin
- * @subpackage  Content.autogallery
+ * @subpackage  Content.csautogallery
  * @version     1.5.0
  * @since       5.0
+ * @copyright   (C) 2024 ColdStar Technology. All rights reserved.
  * @license     GNU General Public License version 2 or later
  */
 
-namespace ColdStar\Plugin\Content\Autogallery\Extension;
+namespace ColdStar\Plugin\Content\CsAutogallery\Extension;
 
 defined('_JEXEC') or die;
 
@@ -18,14 +19,14 @@ use Joomla\Event\SubscriberInterface;
 use Joomla\CMS\Event\Content\ContentPrepareEvent;
 
 /**
- * Auto Gallery Content Plugin
+ * CS Auto Gallery Content Plugin
  *
- * Bootstrap 5 gallery with GLightbox. Auto-scans folder mapped from URL or shortcode.
- * Supports thumbnail sizing, duplicate guard, and debug context.
+ * Bootstrap 5 gallery with optional GLightbox lightbox. Auto-scans folder mapped from URL or shortcode.
+ * Supports image sizing, lightbox toggle, and debug context.
  *
  * @since  5.0
  */
-final class Autogallery extends CMSPlugin implements SubscriberInterface
+final class CsAutogallery extends CMSPlugin implements SubscriberInterface
 {
     /**
      * Load the language file on instantiation.
@@ -97,6 +98,7 @@ final class Autogallery extends CMSPlugin implements SubscriberInterface
             }
 
             // Params with shortcode overrides
+            $enableLightbox = (bool) $this->params->get('enable_lightbox', 1);
             $baseFs       = rtrim($this->getParamDefaultPath('base_fs', JPATH_ROOT . '/images/music'), '/');
             $baseUrl      = rtrim($this->params->get('base_url', Uri::root(true) . '/images/music'), '/');
             $extensions   = $this->params->get('extensions', 'jpg,jpeg,png,gif,webp,avif');
@@ -105,6 +107,10 @@ final class Autogallery extends CMSPlugin implements SubscriberInterface
             $showEmpty    = (bool) $this->params->get('show_empty_message', 1);
             $showDebug    = (bool) $this->params->get('show_debug_path', 0);
 
+            // Image sizing params
+            $imageWidth  = (string) $this->params->get('image_width', '');
+            $imageHeight = (string) $this->params->get('image_height', '');
+
             // Thumbnail sizing params
             $thumbMinW = (string) $this->params->get('thumb_min_w', '');
             $thumbMaxW = (string) $this->params->get('thumb_max_w', '');
@@ -112,6 +118,7 @@ final class Autogallery extends CMSPlugin implements SubscriberInterface
             $thumbMaxH = (string) $this->params->get('thumb_max_h', '');
 
             // Shortcode overrides (per tag)
+            $enableLightbox = isset($attrs['lightbox']) ? (bool) (int) $attrs['lightbox'] : $enableLightbox;
             $baseFs       = isset($attrs['base_fs']) ? $this->applyJpathToken($attrs['base_fs']) : $baseFs;
             $baseUrl      = isset($attrs['base_url']) ? rtrim($attrs['base_url'], '/') : $baseUrl;
             $extensions   = $attrs['extensions'] ?? $extensions;
@@ -119,6 +126,10 @@ final class Autogallery extends CMSPlugin implements SubscriberInterface
             $showCaptions = isset($attrs['show_captions']) ? (bool) (int) $attrs['show_captions'] : $showCaptions;
             $showEmpty    = isset($attrs['show_empty_message']) ? (bool) (int) $attrs['show_empty_message'] : $showEmpty;
             $showDebug    = isset($attrs['show_debug_path']) ? (bool) (int) $attrs['show_debug_path'] : $showDebug;
+
+            // Per-shortcode overrides for image sizing
+            $imageWidth  = isset($attrs['width']) ? (string) $attrs['width'] : $imageWidth;
+            $imageHeight = isset($attrs['height']) ? (string) $attrs['height'] : $imageHeight;
 
             // Per-shortcode overrides for thumb sizing (accepts CSS lengths like 120px, 8rem, 100%, auto)
             $thumbMinW = isset($attrs['thumb_min_w']) ? (string) $attrs['thumb_min_w'] : $thumbMinW;
@@ -142,7 +153,7 @@ final class Autogallery extends CMSPlugin implements SubscriberInterface
 
             $images = $this->findImages($dirFs, $dirUrl, $exts, $baseFs);
 
-            $this->enqueueAssets($showCaptions);
+            $this->enqueueAssets($enableLightbox, $showCaptions, $imageWidth, $imageHeight);
 
             // Build inline CSS variables for this gallery instance
             $styleVars = [];
@@ -158,6 +169,12 @@ final class Autogallery extends CMSPlugin implements SubscriberInterface
             if ($thumbMaxH !== '') {
                 $styleVars[] = '--thumb-max-h:' . htmlspecialchars($thumbMaxH, ENT_QUOTES, 'UTF-8');
             }
+            if ($imageWidth !== '') {
+                $styleVars[] = '--img-width:' . htmlspecialchars($imageWidth, ENT_QUOTES, 'UTF-8');
+            }
+            if ($imageHeight !== '') {
+                $styleVars[] = '--img-height:' . htmlspecialchars($imageHeight, ENT_QUOTES, 'UTF-8');
+            }
             $styleAttr = $styleVars ? ' style="' . implode(';', $styleVars) . '"' : '';
 
             $output = '';
@@ -171,12 +188,12 @@ final class Autogallery extends CMSPlugin implements SubscriberInterface
                         $sourceId = ' #' . (int) $article->moduleid;
                     }
                 }
-                $output .= '<div class="alert alert-secondary auto-gallery">'
+                $output .= '<div class="alert alert-secondary cs-auto-gallery">'
                     . 'Looking for images in: <code>' . htmlspecialchars($dirUrl, ENT_QUOTES, 'UTF-8') . '</code>'
                     . '<br><small>Context: ' . $origin . $sourceId . '</small>'
                     . '</div>';
             }
-            $output .= $this->renderGalleryHtml($images, $title, $colClasses, $showCaptions, $showEmpty, $styleAttr);
+            $output .= $this->renderGalleryHtml($images, $title, $colClasses, $showCaptions, $showEmpty, $enableLightbox, $styleAttr);
             return $output;
         }, $article->text);
     }
@@ -328,38 +345,55 @@ final class Autogallery extends CMSPlugin implements SubscriberInterface
     }
 
     /**
-     * Register and enqueue CSS/JS assets for GLightbox.
+     * Register and enqueue CSS/JS assets.
      *
-     * @param   bool  $showCaptions  Whether captions are enabled.
+     * @param   bool    $enableLightbox  Whether lightbox is enabled.
+     * @param   bool    $showCaptions    Whether captions are enabled.
+     * @param   string  $imageWidth      CSS width for images.
+     * @param   string  $imageHeight     CSS height for images.
      *
      * @return  void
      *
      * @since   5.0
      */
-    private function enqueueAssets(bool $showCaptions): void
+    private function enqueueAssets(bool $enableLightbox, bool $showCaptions, string $imageWidth, string $imageHeight): void
     {
         $wa = $this->getApplication()->getDocument()->getWebAssetManager();
-        if (!$wa->assetExists('style', 'glightbox')) {
-            $wa->registerStyle('glightbox', 'https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css', [], ['rel' => 'stylesheet']);
+
+        // Only load GLightbox if lightbox is enabled
+        if ($enableLightbox) {
+            if (!$wa->assetExists('style', 'glightbox')) {
+                $wa->registerStyle('glightbox', 'https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css', [], ['rel' => 'stylesheet']);
+            }
+            if (!$wa->assetExists('script', 'glightbox')) {
+                $wa->registerScript('glightbox', 'https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js', [], ['defer' => true]);
+            }
+            $wa->useStyle('glightbox')->useScript('glightbox');
         }
-        if (!$wa->assetExists('script', 'glightbox')) {
-            $wa->registerScript('glightbox', 'https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js', [], ['defer' => true]);
-        }
-        $wa->useStyle('glightbox')->useScript('glightbox');
 
         static $inited = false;
         if (!$inited) {
             $inited = true;
-            $init = "document.addEventListener('DOMContentLoaded',function(){ if(window.GLightbox){ GLightbox({selector:'.glightbox'}); }});";
-            $wa->addInlineScript($init);
-            $css = ".auto-gallery .thumb{aspect-ratio:1/1;overflow:hidden;border-radius:.5rem;
+
+            if ($enableLightbox) {
+                $init = "document.addEventListener('DOMContentLoaded',function(){ if(window.GLightbox){ GLightbox({selector:'.glightbox'}); }});";
+                $wa->addInlineScript($init);
+            }
+
+            $css = ".cs-auto-gallery .thumb{aspect-ratio:1/1;overflow:hidden;border-radius:.5rem;
   min-width:var(--thumb-min-w, initial);
   max-width:var(--thumb-max-w, none);
   min-height:var(--thumb-min-h, initial);
   max-height:var(--thumb-max-h, none);
 }
-.auto-gallery img{width:100%;height:100%;display:block;object-fit:cover;transition:transform .18s ease;}
-.auto-gallery a:hover img{transform:scale(1.03);}";
+.cs-auto-gallery img{
+  width:var(--img-width, 100%);
+  height:var(--img-height, 100%);
+  display:block;
+  object-fit:cover;
+  transition:transform .18s ease;
+}
+.cs-auto-gallery a:hover img,.cs-auto-gallery .gallery-item:hover img{transform:scale(1.03);}";
             $wa->addInlineStyle($css);
         }
     }
@@ -367,22 +401,23 @@ final class Autogallery extends CMSPlugin implements SubscriberInterface
     /**
      * Render the gallery HTML output.
      *
-     * @param   array   $images        Array of image data.
-     * @param   string  $title         Gallery title.
-     * @param   string  $colClasses    Bootstrap column classes.
-     * @param   bool    $showCaptions  Whether to show captions.
-     * @param   bool    $showEmpty     Whether to show empty message.
-     * @param   string  $styleAttr     Inline style attribute.
+     * @param   array   $images          Array of image data.
+     * @param   string  $title           Gallery title.
+     * @param   string  $colClasses      Bootstrap column classes.
+     * @param   bool    $showCaptions    Whether to show captions.
+     * @param   bool    $showEmpty       Whether to show empty message.
+     * @param   bool    $enableLightbox  Whether lightbox is enabled.
+     * @param   string  $styleAttr       Inline style attribute.
      *
      * @return  string
      *
      * @since   5.0
      */
-    private function renderGalleryHtml(array $images, string $title, string $colClasses, bool $showCaptions, bool $showEmpty, string $styleAttr = ''): string
+    private function renderGalleryHtml(array $images, string $title, string $colClasses, bool $showCaptions, bool $showEmpty, bool $enableLightbox, string $styleAttr = ''): string
     {
         if (empty($images)) {
             if ($showEmpty) {
-                return '<div class="alert alert-info auto-gallery">No images found for <strong>'
+                return '<div class="alert alert-info cs-auto-gallery">No images found for <strong>'
                     . htmlspecialchars($title, ENT_QUOTES, 'UTF-8')
                     . '</strong>.</div>';
             }
@@ -390,17 +425,28 @@ final class Autogallery extends CMSPlugin implements SubscriberInterface
         }
 
         $html = [];
-        $html[] = '<div class="auto-gallery"' . $styleAttr . '><div class="row g-3">';
+        $html[] = '<div class="cs-auto-gallery"' . $styleAttr . '><div class="row g-3">';
         foreach ($images as $img) {
             $caption = $this->filenameToCaption($img['name']);
             $imgUrl  = htmlspecialchars($img['url'], ENT_QUOTES, 'UTF-8');
             $capAttr = htmlspecialchars($caption, ENT_QUOTES, 'UTF-8');
-            $html[] = '<div class="' . htmlspecialchars($colClasses, ENT_QUOTES, 'UTF-8') . '">'
-                .   '<a href="' . $imgUrl . '" class="glightbox" data-gallery="auto-gallery"'
-                .       ($showCaptions ? ' data-title="' . $capAttr . '"' : '') . '>'
-                .     '<div class="thumb"><img src="' . $imgUrl . '" alt="' . $capAttr . '" loading="lazy" class="img-fluid"/></div>'
-                .   '</a>'
-                . '</div>';
+
+            if ($enableLightbox) {
+                // With lightbox - wrap in anchor tag
+                $html[] = '<div class="' . htmlspecialchars($colClasses, ENT_QUOTES, 'UTF-8') . '">'
+                    .   '<a href="' . $imgUrl . '" class="glightbox" data-gallery="cs-auto-gallery"'
+                    .       ($showCaptions ? ' data-title="' . $capAttr . '"' : '') . '>'
+                    .     '<div class="thumb"><img src="' . $imgUrl . '" alt="' . $capAttr . '" loading="lazy" class="img-fluid"/></div>'
+                    .   '</a>'
+                    . '</div>';
+            } else {
+                // Without lightbox - just display image
+                $html[] = '<div class="' . htmlspecialchars($colClasses, ENT_QUOTES, 'UTF-8') . '">'
+                    .   '<div class="gallery-item">'
+                    .     '<div class="thumb"><img src="' . $imgUrl . '" alt="' . $capAttr . '" loading="lazy" class="img-fluid"/></div>'
+                    .   '</div>'
+                    . '</div>';
+            }
         }
         $html[] = '</div></div>';
         return implode("\n", $html);
