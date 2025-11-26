@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<extension type="plugin" group="content" method="upgrade">
+<extension type="plugin" group="content" element="csautogallery" method="upgrade">
     <name>plg_content_csautogallery</name>
     <author>Tim Davis - Cybersalt Consulting Ltd.</author>
     <creationDate>2025-11</creationDate>
