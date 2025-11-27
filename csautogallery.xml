@@ -2,7 +2,7 @@
 <extension type="plugin" group="content" method="upgrade" version="5.0">
   <name>plg_content_csautogallery</name>
   <author>Tim Davis - Cybersalt Consulting Ltd.</author>
-  <version>1.6.0</version>
+  <version>1.6.1</version>
   <description>Bootstrap 5 gallery with optional GLightbox. Auto-scans folder mapped from URL or shortcode.</description>
   <files>
     <filename plugin="csautogallery">csautogallery.php</filename>
@@ -19,7 +19,9 @@
         <field name="base_fs" type="text" label="Base Filesystem Folder" description="Absolute path for galleries" default="{JPATH_ROOT}/images/music" />
         <field name="base_url" type="text" label="Base Public URL" description="Public URL for galleries" default="/images/music" />
         <field name="extensions" type="text" label="Allowed Extensions" description="Comma-separated extensions" default="jpg,jpeg,png,gif,webp,avif" />
-        <field name="col_classes" type="text" label="Grid Column Classes" description="Bootstrap column classes" default="col-6 col-sm-4 col-md-3 col-lg-3" />
+        <field name="col_classes" type="text" label="Grid Column Classes" description="Bootstrap column classes. Use col-auto for fixed-size thumbnails." default="col-6 col-sm-4 col-md-3 col-lg-3" />
+        <field name="thumb_size" type="text" label="Thumbnail Size" description="CSS size for square thumbnails (e.g., 120px, 150px). Leave empty for responsive sizing." default="" />
+        <field name="filename_prefix" type="text" label="Filename Prefix Filter" description="Only show images starting with this prefix (e.g., pi- or spi-). Comma-separated for multiple prefixes. Leave empty to show all." default="" />
         <field name="show_captions" type="radio" label="Show Captions" description="Show captions in lightbox" class="btn-group btn-group-yesno" default="1">
           <option value="1">JYES</option>
           <option value="0">JNO</option>
@@ -32,12 +34,6 @@
           <option value="1">JYES</option>
           <option value="0">JNO</option>
         </field>
-        <field name="image_width" type="text" label="Image Width" description="CSS width (e.g., 200px)" />
-        <field name="image_height" type="text" label="Image Height" description="CSS height (e.g., 200px)" />
-        <field name="thumb_min_w" type="text" label="Thumb Min Width" description="Min width CSS" />
-        <field name="thumb_max_w" type="text" label="Thumb Max Width" description="Max width CSS" />
-        <field name="thumb_min_h" type="text" label="Thumb Min Height" description="Min height CSS" />
-        <field name="thumb_max_h" type="text" label="Thumb Max Height" description="Max height CSS" />
       </fieldset>
     </fields>
   </config>

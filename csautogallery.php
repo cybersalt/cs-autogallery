@@ -2,7 +2,7 @@
 /**
  * @package     Joomla.Plugin
  * @subpackage  Content.csautogallery
- * @version     1.6.0
+ * @version     1.6.1
  * @since       5.0
  * @copyright   (C) 2025 Cybersalt Consulting Ltd. All rights reserved.
  * @license     GNU General Public License version 2 or later
@@ -53,6 +53,7 @@ class PlgContentCsautogallery extends CMSPlugin
             $showCaptions = (bool) $this->params->get('show_captions', 1);
             $showEmpty    = (bool) $this->params->get('show_empty_message', 1);
             $showDebug    = (bool) $this->params->get('show_debug_path', 0);
+            $filenamePrefix = (string) $this->params->get('filename_prefix', '');
 
             // Image sizing params
             $imageWidth  = (string) $this->params->get('image_width', '');
@@ -73,6 +74,7 @@ class PlgContentCsautogallery extends CMSPlugin
             $showCaptions = isset($attrs['show_captions']) ? (bool) (int) $attrs['show_captions'] : $showCaptions;
             $showEmpty    = isset($attrs['show_empty_message']) ? (bool) (int) $attrs['show_empty_message'] : $showEmpty;
             $showDebug    = isset($attrs['show_debug_path']) ? (bool) (int) $attrs['show_debug_path'] : $showDebug;
+            $filenamePrefix = isset($attrs['prefix']) ? (string) $attrs['prefix'] : $filenamePrefix;
 
             // Per-shortcode overrides for image sizing
             $imageWidth  = isset($attrs['width']) ? (string) $attrs['width'] : $imageWidth;
@@ -98,7 +100,7 @@ class PlgContentCsautogallery extends CMSPlugin
                 $exts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'];
             }
 
-            $images = $this->findImages($dirFs, $dirUrl, $exts, $baseFs);
+            $images = $this->findImages($dirFs, $dirUrl, $exts, $baseFs, $filenamePrefix);
 
             $this->enqueueAssets($enableLightbox, $imageWidth, $imageHeight);
 
@@ -208,7 +210,7 @@ class PlgContentCsautogallery extends CMSPlugin
         return [$dirFs, $dirUrl, $title];
     }
 
-    private function findImages($dirFs, $dirUrl, $exts, $baseFs)
+    private function findImages($dirFs, $dirUrl, $exts, $baseFs, $prefixFilter = '')
     {
         $images = [];
         $realBase = realpath($baseFs);
@@ -216,12 +218,34 @@ class PlgContentCsautogallery extends CMSPlugin
         if (!$realDir || !$realBase || strpos($realDir, $realBase) !== 0) {
             return $images;
         }
+
+        // Parse prefix filter (comma-separated, case-insensitive)
+        $prefixes = [];
+        if ($prefixFilter !== '') {
+            $prefixes = array_filter(array_map('trim', explode(',', $prefixFilter)));
+        }
+
         foreach (glob($realDir . '/*.*') ?: [] as $pathFs) {
             $ext = strtolower(pathinfo($pathFs, PATHINFO_EXTENSION));
             if (!in_array($ext, $exts, true) || !is_file($pathFs)) {
                 continue;
             }
             $name = basename($pathFs);
+
+            // Filter by prefix if specified
+            if (!empty($prefixes)) {
+                $matches = false;
+                foreach ($prefixes as $prefix) {
+                    if (stripos($name, $prefix) === 0) {
+                        $matches = true;
+                        break;
+                    }
+                }
+                if (!$matches) {
+                    continue;
+                }
+            }
+
             $images[] = [
                 'url' => $dirUrl . '/' . rawurlencode($name),
                 'name' => $name,

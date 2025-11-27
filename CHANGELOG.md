@@ -5,6 +5,11 @@ All notable changes to CS Auto Gallery will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.1] - 2025-11-27
+
+### 🚀 New Features
+- **Filename Prefix Filter**: New setting to only show images starting with specific prefixes (e.g., `pi-` or `spi-`). Supports comma-separated multiple prefixes. Can also be set per-shortcode with `prefix="pi-"`.
+
 ## [1.6.0] - 2025-11-27
 
 ### 🔧 Improvements
