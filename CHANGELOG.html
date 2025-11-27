@@ -1,0 +1,61 @@
+<div class="changelog-container">
+    <h1>CS Auto Gallery - Changelog</h1>
+
+    <div class="intro">
+        <p><strong>All notable changes to CS Auto Gallery will be documented here.</strong></p>
+    </div>
+
+    <h2>
+        <span class="version-badge">v1.6.0</span>
+        <span class="date">2025-11-27</span>
+    </h2>
+
+    <h3><span class="section-icon">🔧</span> Improvements</h3>
+    <ul>
+        <li><strong>Simplified Settings</strong>: Replaced 6 confusing size fields with single "Thumbnail Size" setting</li>
+        <li><strong>Better Documentation</strong>: Added hint to use <code>col-auto</code> for fixed-size thumbnails in Grid Column Classes description</li>
+    </ul>
+
+    <h3><span class="section-icon">🐛</span> Bug Fixes</h3>
+    <ul>
+        <li><strong>Unicode Encoding Fix</strong>: Fixed PHP syntax error on line 180 caused by Unicode curly quotes corrupting during file transfer. Now uses hex escape sequences instead of literal Unicode characters.</li>
+    </ul>
+
+    <h2>
+        <span class="version-badge">v1.5.0</span>
+        <span class="date">2025-11-26</span>
+    </h2>
+
+    <h3><span class="section-icon">🚀</span> New Features</h3>
+    <ul>
+        <li><strong>Enable Lightbox Toggle</strong>: Added setting to turn GLightbox popup on/off</li>
+        <li><strong>Image Sizing Options</strong>: Added width/height settings for thumbnails</li>
+        <li><strong>Auto URL Detection</strong>: Automatically maps page URL slug to image folder (e.g., <code>/artists/bob-marley</code> → <code>B/Bob-Marley/</code>)</li>
+    </ul>
+
+    <h3><span class="section-icon">🔧</span> Improvements</h3>
+    <ul>
+        <li><strong>Alphabetical Bucketing</strong>: Images organized in A-Z folders for better organization</li>
+        <li><strong>Bootstrap 5 Grid</strong>: Responsive gallery using Bootstrap column classes</li>
+        <li><strong>GLightbox Integration</strong>: Modern lightbox with smooth animations</li>
+    </ul>
+
+    <h2>
+        <span class="version-badge">v1.0.0</span>
+        <span class="date">2025-11-25</span>
+    </h2>
+
+    <h3><span class="section-icon">🚀</span> Initial Release</h3>
+    <ul>
+        <li>Bootstrap 5 responsive image gallery</li>
+        <li>GLightbox integration for image popups</li>
+        <li>Shortcode support: <code>{auto-gallery}</code></li>
+        <li>Configurable base path for image folders</li>
+        <li>Caption generation from filenames</li>
+        <li>Debug mode for troubleshooting paths</li>
+    </ul>
+
+    <div class="footer">
+        <p>&copy; 2025 Cybersalt Consulting Ltd.</p>
+    </div>
+</div>
