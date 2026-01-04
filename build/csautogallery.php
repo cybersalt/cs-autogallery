@@ -2,7 +2,7 @@
 /**
  * @package     Joomla.Plugin
  * @subpackage  Content.csautogallery
- * @version     1.6.1
+ * @version     1.7.0
  * @since       5.0
  * @copyright   (C) 2025 Cybersalt Consulting Ltd. All rights reserved.
  * @license     GNU General Public License version 2 or later
@@ -193,10 +193,48 @@ class PlgContentCsautogallery extends CMSPlugin
         if ($bucket === '' || !preg_match('~[A-Z]~', $bucket)) {
             $bucket = '0-9';
         }
+
+        // Case-insensitive folder lookup: if exact match doesn't exist, scan for match
+        $bucketPath = $baseFs . '/' . $bucket;
+        $actualFolder = $this->findFolderCaseInsensitive($bucketPath, $folderName);
+        if ($actualFolder !== null) {
+            $folderName = $actualFolder;
+        }
+
         $dirFs = $baseFs . '/' . $bucket . '/' . $folderName;
         $dirUrl = $baseUrl . '/' . rawurlencode($bucket) . '/' . rawurlencode($folderName);
         $title  = $folderName !== '' ? $folderName : 'Gallery';
         return [$dirFs, $dirUrl, $title];
+    }
+
+    private function findFolderCaseInsensitive($bucketPath, $targetFolder)
+    {
+        if ($targetFolder === '' || !is_dir($bucketPath)) {
+            return null;
+        }
+
+        // Check if exact match exists first (fastest path)
+        if (is_dir($bucketPath . '/' . $targetFolder)) {
+            return $targetFolder;
+        }
+
+        // Scan directory for case-insensitive match
+        $targetLower = strtolower($targetFolder);
+        $entries = @scandir($bucketPath);
+        if ($entries === false) {
+            return null;
+        }
+
+        foreach ($entries as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            if (strtolower($entry) === $targetLower && is_dir($bucketPath . '/' . $entry)) {
+                return $entry;
+            }
+        }
+
+        return null;
     }
 
     private function resolveFromFolder($folder, $baseFs, $baseUrl)

@@ -2,7 +2,7 @@
 <extension type="plugin" group="content" method="upgrade" version="5.0">
   <name>plg_content_csautogallery</name>
   <author>Tim Davis - Cybersalt Consulting Ltd.</author>
-  <version>1.6.1</version>
+  <version>1.7.0</version>
   <description>Bootstrap 5 gallery with optional GLightbox. Auto-scans folder mapped from URL or shortcode.</description>
   <files>
     <filename plugin="csautogallery">csautogallery.php</filename>
