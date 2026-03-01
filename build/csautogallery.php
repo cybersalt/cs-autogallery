@@ -2,7 +2,7 @@
 /**
  * @package     Joomla.Plugin
  * @subpackage  Content.csautogallery
- * @version     1.7.0
+ * @version     1.8.0
  * @since       5.0
  * @copyright   (C) 2025 Cybersalt Consulting Ltd. All rights reserved.
  * @license     GNU General Public License version 2 or later
@@ -54,6 +54,7 @@ class PlgContentCsautogallery extends CMSPlugin
             $showEmpty    = (bool) $this->params->get('show_empty_message', 1);
             $showDebug    = (bool) $this->params->get('show_debug_path', 0);
             $filenamePrefix = (string) $this->params->get('filename_prefix', '');
+            $borderRadius   = (string) $this->params->get('border_radius', '');
 
             // Image sizing params
             $imageWidth  = (string) $this->params->get('image_width', '');
@@ -75,6 +76,7 @@ class PlgContentCsautogallery extends CMSPlugin
             $showEmpty    = isset($attrs['show_empty_message']) ? (bool) (int) $attrs['show_empty_message'] : $showEmpty;
             $showDebug    = isset($attrs['show_debug_path']) ? (bool) (int) $attrs['show_debug_path'] : $showDebug;
             $filenamePrefix = isset($attrs['prefix']) ? (string) $attrs['prefix'] : $filenamePrefix;
+            $borderRadius   = isset($attrs['border_radius']) ? (string) $attrs['border_radius'] : $borderRadius;
 
             // Per-shortcode overrides for image sizing
             $imageWidth  = isset($attrs['width']) ? (string) $attrs['width'] : $imageWidth;
@@ -123,6 +125,9 @@ class PlgContentCsautogallery extends CMSPlugin
             }
             if ($imageHeight !== '') {
                 $styleVars[] = '--img-height:' . htmlspecialchars($imageHeight, ENT_QUOTES, 'UTF-8');
+            }
+            if ($borderRadius !== '') {
+                $styleVars[] = '--thumb-radius:' . htmlspecialchars($borderRadius, ENT_QUOTES, 'UTF-8');
             }
             $styleAttr = $styleVars ? ' style="' . implode(';', $styleVars) . '"' : '';
 
@@ -319,7 +324,7 @@ class PlgContentCsautogallery extends CMSPlugin
                 $wa->addInlineScript($init);
             }
 
-            $css = ".cs-auto-gallery .thumb{aspect-ratio:1/1;overflow:hidden;border-radius:.5rem;
+            $css = ".cs-auto-gallery .thumb{aspect-ratio:1/1;overflow:hidden;border-radius:var(--thumb-radius,.5rem);
   min-width:var(--thumb-min-w, initial);
   max-width:var(--thumb-max-w, none);
   min-height:var(--thumb-min-h, initial);
